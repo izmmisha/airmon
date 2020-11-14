@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Add HomeKit ADK
-set(EXTRA_COMPONENT_DIRS ${CMAKE_CURRENT_LIST_DIR}/../../)
+set(EXTRA_COMPONENT_DIRS ${CMAKE_CURRENT_LIST_DIR}/../esp-apple-homekit-adk/)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 if(CONFIG_HAP_MFI_HW_AUTH)
     add_definitions(-DHAVE_MFI_HW_AUTH=1)

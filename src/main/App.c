@@ -117,22 +117,24 @@ static void SaveAccessoryState(void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
- * HomeKit accessory that provides the Light Bulb service.
+ * HomeKit accessory that provides the Sensors services.
  *
  * Note: Not constant to enable BCT Manual Name Change.
  */
 static HAPAccessory accessory = { .aid = 1,
-                                  .category = kHAPAccessoryCategory_Lighting,
-                                  .name = "Acme Light Bulb",
-                                  .manufacturer = "Acme",
-                                  .model = "LightBulb1,1",
+                                  .category = kHAPAccessoryCategory_Sensors,
+                                  .name = "Air monitor",
+                                  .manufacturer = "IM",
+                                  .model = "AirMon1,1",
                                   .serialNumber = "099DB48E9E28",
                                   .firmwareVersion = "1",
                                   .hardwareVersion = "1",
                                   .services = (const HAPService* const[]) { &accessoryInformationService,
                                                                             &hapProtocolInformationService,
                                                                             &pairingService,
-                                                                            &lightBulbService,
+                                                                            &temperatureSensorService,
+                                                                            &humiditySensorService,
+                                                                            &carbonDioxideSensorService,
                                                                             NULL },
                                   .callbacks = { .identify = IdentifyAccessory } };
 
@@ -148,31 +150,49 @@ HAPError IdentifyAccessory(
 }
 
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnRead(
+HAPError HandleTemperatureSensorCurrentTemperatureRead(
         HAPAccessoryServerRef* server HAP_UNUSED,
-        const HAPBoolCharacteristicReadRequest* request HAP_UNUSED,
-        bool* value,
+        const HAPFloatCharacteristicReadRequest* request HAP_UNUSED,
+        float* value,
         void* _Nullable context HAP_UNUSED) {
-    *value = accessoryConfiguration.state.lightBulbOn;
+    *value = 0;
     HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, *value ? "true" : "false");
 
     return kHAPError_None;
 }
 
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnWrite(
-        HAPAccessoryServerRef* server,
-        const HAPBoolCharacteristicWriteRequest* request,
-        bool value,
+HAPError HandleHumiditySensorCurrentRelativeHumidityRead(
+        HAPAccessoryServerRef* server HAP_UNUSED,
+        const HAPFloatCharacteristicReadRequest* request HAP_UNUSED,
+        float* value,
         void* _Nullable context HAP_UNUSED) {
-    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, value ? "true" : "false");
-    if (accessoryConfiguration.state.lightBulbOn != value) {
-        accessoryConfiguration.state.lightBulbOn = value;
+    *value = 0;
+    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, *value ? "true" : "false");
 
-        SaveAccessoryState();
+    return kHAPError_None;
+}
 
-        HAPAccessoryServerRaiseEvent(server, request->characteristic, request->service, request->accessory);
-    }
+HAP_RESULT_USE_CHECK
+HAPError HandleCarbonDioxideSensorCarbonDioxideDetectedRead(
+        HAPAccessoryServerRef* server HAP_UNUSED,
+        const HAPUInt8CharacteristicReadRequest* request HAP_UNUSED,
+        uint8_t* value,
+        void* _Nullable context HAP_UNUSED) {
+    *value = 0;
+    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, *value ? "true" : "false");
+
+    return kHAPError_None;
+}
+
+HAP_RESULT_USE_CHECK
+HAPError HandleCarbonDioxideSensorCarbonDioxideLevelRead(
+        HAPAccessoryServerRef* server HAP_UNUSED,
+        const HAPFloatCharacteristicReadRequest* request HAP_UNUSED,
+        float* value,
+        void* _Nullable context HAP_UNUSED) {
+    *value = 0;
+    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, *value ? "true" : "false");
 
     return kHAPError_None;
 }

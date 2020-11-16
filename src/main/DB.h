@@ -23,7 +23,7 @@ extern "C" {
 /**
  * Total number of services and characteristics contained in the accessory.
  */
-#define kAttributeCount ((size_t) 21)
+#define kAttributeCount ((size_t) 30)
 
 /**
  * HomeKit Accessory Information service.
@@ -53,14 +53,11 @@ extern const HAPService hapProtocolInformationService;
 extern const HAPService pairingService;
 
 /**
- * Light Bulb service.
+ * Sensors services.
  */
-extern const HAPService lightBulbService;
-
-/**
- * The 'On' characteristic of the Light Bulb service.
- */
-extern const HAPBoolCharacteristic lightBulbOnCharacteristic;
+extern const HAPService temperatureSensorService;
+extern const HAPService humiditySensorService;
+extern const HAPService carbonDioxideSensorService;
 
 #if __has_feature(nullability)
 #pragma clang assume_nonnull end

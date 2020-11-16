@@ -36,12 +36,23 @@
 #define kIID_PairingPairingFeatures ((uint64_t) 0x0024)
 #define kIID_PairingPairingPairings ((uint64_t) 0x0025)
 
-#define kIID_LightBulb                 ((uint64_t) 0x0030)
-#define kIID_LightBulbServiceSignature ((uint64_t) 0x0031)
-#define kIID_LightBulbName             ((uint64_t) 0x0032)
-#define kIID_LightBulbOn               ((uint64_t) 0x0033)
+#define kIID_TemperatureSensor                   ((uint64_t) 0x0030)
+#define kIID_TemperatureSensorServiceSignature   ((uint64_t) 0x0031)
+#define kIID_TemperatureSensorName               ((uint64_t) 0x0032)
+#define kIID_TemperatureSensorCurrentTemperature ((uint64_t) 0x0033)
 
-HAP_STATIC_ASSERT(kAttributeCount == 9 + 3 + 5 + 4, AttributeCount_mismatch);
+#define kIID_HumiditySensor                        ((uint64_t) 0x0040)
+#define kIID_HumiditySensorServiceSignature        ((uint64_t) 0x0041)
+#define kIID_HumiditySensorName                    ((uint64_t) 0x0042)
+#define kIID_HumiditySensorCurrentRelativeHumidity ((uint64_t) 0x0043)
+
+#define kIID_CarbonDioxideSensor                      ((uint64_t) 0x0050)
+#define kIID_CarbonDioxideSensorServiceSignature      ((uint64_t) 0x0051)
+#define kIID_CarbonDioxideSensorName                  ((uint64_t) 0x0052)
+#define kIID_CarbonDioxideSensorCarbonDioxideDetected ((uint64_t) 0x0053)
+#define kIID_CarbonDioxideSensorCarbonDioxideLevel    ((uint64_t) 0x0054)
+
+HAP_STATIC_ASSERT(kAttributeCount == 9 + 3 + 5 + 4 + 4 + 5, AttributeCount_mismatch);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -392,11 +403,11 @@ const HAPService pairingService = {
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
- * The 'Service Signature' characteristic of the Light Bulb service.
+ * The 'Service Signature' characteristic of the Temperature Sensor service.
  */
-static const HAPDataCharacteristic lightBulbServiceSignatureCharacteristic = {
+static const HAPDataCharacteristic temperatureSensorServiceSignatureCharacteristic = {
     .format = kHAPCharacteristicFormat_Data,
-    .iid = kIID_LightBulbServiceSignature,
+    .iid = kIID_TemperatureSensorServiceSignature,
     .characteristicType = &kHAPCharacteristicType_ServiceSignature,
     .debugDescription = kHAPCharacteristicDebugDescription_ServiceSignature,
     .manufacturerDescription = NULL,
@@ -416,11 +427,11 @@ static const HAPDataCharacteristic lightBulbServiceSignatureCharacteristic = {
 };
 
 /**
- * The 'Name' characteristic of the Light Bulb service.
+ * The 'Name' characteristic of the Temperature Sensor service.
  */
-static const HAPStringCharacteristic lightBulbNameCharacteristic = {
+static const HAPStringCharacteristic temperatureSensorNameCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
-    .iid = kIID_LightBulbName,
+    .iid = kIID_TemperatureSensorName,
     .characteristicType = &kHAPCharacteristicType_Name,
     .debugDescription = kHAPCharacteristicDebugDescription_Name,
     .manufacturerDescription = NULL,
@@ -440,16 +451,16 @@ static const HAPStringCharacteristic lightBulbNameCharacteristic = {
 };
 
 /**
- * The 'On' characteristic of the Light Bulb service.
+ * The 'Current Temperature' characteristic of the Temperature Sensor service.
  */
-const HAPBoolCharacteristic lightBulbOnCharacteristic = {
-    .format = kHAPCharacteristicFormat_Bool,
-    .iid = kIID_LightBulbOn,
-    .characteristicType = &kHAPCharacteristicType_On,
-    .debugDescription = kHAPCharacteristicDebugDescription_On,
+const HAPFloatCharacteristic temperatureSensorCurrentTemperatureCharacteristic = {
+    .format = kHAPCharacteristicFormat_Float,
+    .iid = kIID_TemperatureSensorCurrentTemperature,
+    .characteristicType = &kHAPCharacteristicType_CurrentTemperature,
+    .debugDescription = kHAPCharacteristicDebugDescription_CurrentTemperature,
     .manufacturerDescription = NULL,
     .properties = { .readable = true,
-                    .writable = true,
+                    .writable = false,
                     .supportsEventNotification = true,
                     .hidden = false,
                     .requiresTimedWrite = false,
@@ -459,21 +470,225 @@ const HAPBoolCharacteristic lightBulbOnCharacteristic = {
                              .supportsDisconnectedNotification = true,
                              .readableWithoutSecurity = false,
                              .writableWithoutSecurity = false } },
-    .callbacks = { .handleRead = HandleLightBulbOnRead, .handleWrite = HandleLightBulbOnWrite }
+    .units = kHAPCharacteristicUnits_Celsius,
+    .constraints = { .minimumValue = -40.f, .maximumValue = 120.f, .stepValue = 0.1f },
+    .callbacks = { .handleRead = HandleTemperatureSensorCurrentTemperatureRead, .handleWrite = NULL }
 };
 
 /**
- * The Light Bulb service that contains the 'On' characteristic.
+ * The Temperature Sensor service that contains the 'Current Temperature' characteristic.
  */
-const HAPService lightBulbService = {
-    .iid = kIID_LightBulb,
-    .serviceType = &kHAPServiceType_LightBulb,
-    .debugDescription = kHAPServiceDebugDescription_LightBulb,
-    .name = "Light Bulb",
+const HAPService temperatureSensorService = {
+    .iid = kIID_TemperatureSensor,
+    .serviceType = &kHAPServiceType_TemperatureSensor,
+    .debugDescription = kHAPServiceDebugDescription_TemperatureSensor,
+    .name = "Temperature Sensor",
     .properties = { .primaryService = true, .hidden = false, .ble = { .supportsConfiguration = false } },
     .linkedServices = NULL,
-    .characteristics = (const HAPCharacteristic* const[]) { &lightBulbServiceSignatureCharacteristic,
-                                                            &lightBulbNameCharacteristic,
-                                                            &lightBulbOnCharacteristic,
+    .characteristics = (const HAPCharacteristic* const[]) { &temperatureSensorServiceSignatureCharacteristic,
+                                                            &temperatureSensorNameCharacteristic,
+                                                            &temperatureSensorCurrentTemperatureCharacteristic,
+                                                            NULL }
+};
+
+/**
+ * The 'Service Signature' characteristic of the Temperature Sensor service.
+ */
+static const HAPDataCharacteristic humiditySensorServiceSignatureCharacteristic = {
+    .format = kHAPCharacteristicFormat_Data,
+    .iid = kIID_HumiditySensorServiceSignature,
+    .characteristicType = &kHAPCharacteristicType_ServiceSignature,
+    .debugDescription = kHAPCharacteristicDebugDescription_ServiceSignature,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = true },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .maxLength = 2097152 },
+    .callbacks = { .handleRead = HAPHandleServiceSignatureRead, .handleWrite = NULL }
+};
+
+/**
+ * The 'Name' characteristic of the Humidity Sensor service.
+ */
+static const HAPStringCharacteristic humiditySensorNameCharacteristic = {
+    .format = kHAPCharacteristicFormat_String,
+    .iid = kIID_HumiditySensorName,
+    .characteristicType = &kHAPCharacteristicType_Name,
+    .debugDescription = kHAPCharacteristicDebugDescription_Name,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .maxLength = 64 },
+    .callbacks = { .handleRead = HAPHandleNameRead, .handleWrite = NULL }
+};
+
+/**
+ * The 'Current Relative Humidity' characteristic of the Humidity Sensor service.
+ */
+const HAPFloatCharacteristic humiditySensorCurrentRelativeHumidityCharacteristic = {
+    .format = kHAPCharacteristicFormat_Float,
+    .iid = kIID_HumiditySensorCurrentRelativeHumidity,
+    .characteristicType = &kHAPCharacteristicType_CurrentRelativeHumidity,
+    .debugDescription = kHAPCharacteristicDebugDescription_CurrentRelativeHumidity,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = true,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = true,
+                             .supportsDisconnectedNotification = true,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .units = kHAPCharacteristicUnits_Percentage,
+    .constraints = { .minimumValue = 0.f, .maximumValue = 100.f, .stepValue = 1.f },
+    .callbacks = { .handleRead = HandleHumiditySensorCurrentRelativeHumidityRead, .handleWrite = NULL }
+};
+
+/**
+ * The Humidity Sensor service
+ */
+const HAPService humiditySensorService = {
+    .iid = kIID_HumiditySensor,
+    .serviceType = &kHAPServiceType_HumiditySensor,
+    .debugDescription = kHAPServiceDebugDescription_HumiditySensor,
+    .name = "Humidity Sensor",
+    .properties = { .primaryService = true, .hidden = false, .ble = { .supportsConfiguration = false } },
+    .linkedServices = NULL,
+    .characteristics = (const HAPCharacteristic* const[]) { &humiditySensorServiceSignatureCharacteristic,
+                                                            &humiditySensorNameCharacteristic,
+                                                            &humiditySensorCurrentRelativeHumidityCharacteristic,
+                                                            NULL }
+};
+
+/**
+ * The 'Service Signature' characteristic of the Carbon Dioxide Sensor service.
+ */
+static const HAPDataCharacteristic carbonDioxideSensorServiceSignatureCharacteristic = {
+    .format = kHAPCharacteristicFormat_Data,
+    .iid = kIID_CarbonDioxideSensorServiceSignature,
+    .characteristicType = &kHAPCharacteristicType_ServiceSignature,
+    .debugDescription = kHAPCharacteristicDebugDescription_ServiceSignature,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = true },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .maxLength = 2097152 },
+    .callbacks = { .handleRead = HAPHandleServiceSignatureRead, .handleWrite = NULL }
+};
+
+/**
+ * The 'Name' characteristic of the Carbon Dioxide Sensor service.
+ */
+static const HAPStringCharacteristic carbonDioxideSensorNameCharacteristic = {
+    .format = kHAPCharacteristicFormat_String,
+    .iid = kIID_CarbonDioxideSensorName,
+    .characteristicType = &kHAPCharacteristicType_Name,
+    .debugDescription = kHAPCharacteristicDebugDescription_Name,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .maxLength = 64 },
+    .callbacks = { .handleRead = HAPHandleNameRead, .handleWrite = NULL }
+};
+
+/**
+ * The 'Carbon Dioxide Detected' characteristic of the Carbon Dioxide Sensor service.
+ */
+const HAPUInt8Characteristic carbonDioxideSensorCarbonDioxideDetectedCharacteristic = {
+    .format = kHAPCharacteristicFormat_UInt8,
+    .iid = kIID_CarbonDioxideSensorCarbonDioxideDetected,
+    .characteristicType = &kHAPCharacteristicType_CarbonDioxideDetected,
+    .debugDescription = kHAPCharacteristicDebugDescription_CarbonDioxideDetected,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = true,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = true,
+                             .supportsDisconnectedNotification = true,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .minimumValue = 0, .maximumValue = 1 },
+    .callbacks = { .handleRead = HandleCarbonDioxideSensorCarbonDioxideDetectedRead, .handleWrite = NULL }
+};
+
+/**
+ * The 'Carbon Dioxide Level' characteristic of the Carbon Dioxide Sensor service.
+ */
+const HAPFloatCharacteristic carbonDioxideSensorCarbonDioxideLevelCharacteristic = {
+    .format = kHAPCharacteristicFormat_Float,
+    .iid = kIID_CarbonDioxideSensorCarbonDioxideLevel,
+    .characteristicType = &kHAPCharacteristicType_CarbonDioxideLevel,
+    .debugDescription = kHAPCharacteristicDebugDescription_CarbonDioxideLevel,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = true,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = true,
+                             .supportsDisconnectedNotification = true,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .minimumValue = 0.f, .maximumValue = 12000.f, .stepValue = 1.f },
+    .callbacks = { .handleRead = HandleCarbonDioxideSensorCarbonDioxideLevelRead, .handleWrite = NULL }
+};
+
+/**
+ * The Carbon Dioxide Sensor service
+ */
+const HAPService carbonDioxideSensorService = {
+    .iid = kIID_CarbonDioxideSensor,
+    .serviceType = &kHAPServiceType_CarbonDioxideSensor,
+    .debugDescription = kHAPServiceDebugDescription_CarbonDioxideSensor,
+    .name = "Carbon Dioxide Sensor",
+    .properties = { .primaryService = true, .hidden = false, .ble = { .supportsConfiguration = false } },
+    .linkedServices = NULL,
+    .characteristics = (const HAPCharacteristic* const[]) { &carbonDioxideSensorServiceSignatureCharacteristic,
+                                                            &carbonDioxideSensorNameCharacteristic,
+                                                            &carbonDioxideSensorCarbonDioxideDetectedCharacteristic,
+                                                            &carbonDioxideSensorCarbonDioxideLevelCharacteristic,
                                                             NULL }
 };

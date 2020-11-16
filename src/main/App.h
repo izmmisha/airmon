@@ -33,23 +33,43 @@ HAPError IdentifyAccessory(
         void* _Nullable context);
 
 /**
- * Handle read request to the 'On' characteristic of the Light Bulb service.
+ * Handle read request to the 'Current Temperature' characteristic of the Temperature Sensor service.
  */
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnRead(
+HAPError HandleTemperatureSensorCurrentTemperatureRead(
         HAPAccessoryServerRef* server,
-        const HAPBoolCharacteristicReadRequest* request,
-        bool* value,
+        const HAPFloatCharacteristicReadRequest* request,
+        float* value,
         void* _Nullable context);
 
 /**
- * Handle write request to the 'On' characteristic of the Light Bulb service.
+ * Handle read request to the 'Current Relative Humidity' characteristic of the Humidity Sensor service.
  */
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnWrite(
+HAPError HandleHumiditySensorCurrentRelativeHumidityRead(
         HAPAccessoryServerRef* server,
-        const HAPBoolCharacteristicWriteRequest* request,
-        bool value,
+        const HAPFloatCharacteristicReadRequest* request,
+        float* value,
+        void* _Nullable context);
+
+/**
+ * Handle read request to the 'Carbon Dioxide Detected' characteristic of the Carbon Dioxide Sensor service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleCarbonDioxideSensorCarbonDioxideDetectedRead(
+        HAPAccessoryServerRef* server,
+        const HAPUInt8CharacteristicReadRequest* request,
+        uint8_t* value,
+        void* _Nullable context);
+
+/**
+ * Handle read request to the 'Carbon Dioxide Level' characteristic of the Carbon Dioxide Sensor service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleCarbonDioxideSensorCarbonDioxideLevelRead(
+        HAPAccessoryServerRef* server,
+        const HAPFloatCharacteristicReadRequest* request,
+        float* value,
         void* _Nullable context);
 
 /**

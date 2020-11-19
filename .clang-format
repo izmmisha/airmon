@@ -1,0 +1,31 @@
+---
+# We'll use defaults from the LLVM style, but with 4 columns indentation.
+BasedOnStyle: LLVM
+IndentWidth: 4
+---
+Language: Cpp
+# Force pointers to the type for C++.
+AlignAfterOpenBracket: AlwaysBreak
+DerivePointerAlignment: false
+PointerAlignment: Left
+ColumnLimit: 120
+BinPackArguments: false
+BinPackParameters: false
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowAllParametersOfDeclarationOnNextLine: false
+Cpp11BracedListStyle: false
+SpaceBeforeCpp11BracedList: true
+IndentCaseLabels: true
+ContinuationIndentWidth: 8
+AlignConsecutiveMacros: true
+SpaceAfterCStyleCast: true
+---
+Language: JavaScript
+# Use 100 columns for JS.
+ColumnLimit: 100
+---
+Language: Proto
+# Don't format .proto files.
+DisableFormat: true
+...
